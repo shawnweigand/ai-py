@@ -1,30 +1,19 @@
 from dotenv import load_dotenv
 import os
 import psycopg2
+from chromadb import PersistentClient
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from pgvector.psycopg2 import register_vector
 from loaders.drive_loader import load_drive_folder_docs
 from splitters.recursive_splitter import split_recursive_docs
 
+client = PersistentClient(path="./chroma_data")
+collection = client.get_or_create_collection("my_collection")
+
 load_dotenv()
 
 folder_id = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 api_key = os.getenv("GEMINI_API_KEY")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-
-conn = psycopg2.connect(
-    host=DB_HOST,
-    port=DB_PORT,
-    dbname=DB_NAME,
-    user=DB_USER,
-    password=DB_PASS
-)
-register_vector(conn)
-cur = conn.cursor()
 
 embedding_model = GoogleGenerativeAIEmbeddings(
     model="models/embedding-001",  # or the correct Gemini embedding model name
@@ -65,23 +54,11 @@ for i, doc in enumerate(docs):
         }
         print(data)
         # Insert data into database
-        cur.execute(
-            """
-            INSERT INTO document_embeddings
-            (parent_id, type, document_title, chunk_index, source, content, embedding)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """,
-            (
-                data["parent_id"],           # parent_id
-                data["type"],
-                data["document_id"],
-                data["document_title"],
-                data["chunk_index"],
-                data["source"],
-                data["content"],
-                data["embedding"],
-            )
+        collection.add(
+            documents=[f"{data['document_title']}-{data['chunk_index']}"],
+            # metadatas=[chunk.metadata],
+            embeddings=[embedding],
+            ids=[f"{data['document_title']}-{data['chunk_index']}"],
         )
-        conn.commit()
-        cur.close()
-        conn.close()
+
+print(collection.get())
