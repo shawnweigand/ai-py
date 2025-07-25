@@ -1,0 +1,23 @@
+services:
+  pgsql:
+    container_name: pgvector
+    image: ankane/pgvector:latest
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pgvector
+    volumes:
+      - pgsql_data:/var/lib/pgsql/data
+    ports:
+      - "1234:5432"
+    networks:
+      - ai
+
+networks:
+  ai:
+    # external: true
+    name: ai
+
+volumes:
+  pgsql_data:
