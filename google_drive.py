@@ -56,10 +56,10 @@ for i, doc in enumerate(docs):
         # print(data)
         # Insert data into database
         collection.add(
-            documents=[f"{data['document_title']}-{data['chunk_index']}"],
+            documents=[data["content"]],
             # metadatas=[chunk.metadata],
             embeddings=[embedding],
             ids=[f"{data['document_title']}-{data['chunk_index']}"],
         )
 
-print(collection.get(include=["embeddings", "documents", "ids"]))
+print(collection.get(include=["embeddings", "documents"]))
