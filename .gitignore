@@ -4,3 +4,4 @@ __pycache__/
 .credentials
 .temp
 .csv
+.logs

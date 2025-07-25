@@ -14,11 +14,11 @@ try:
 except ImportError:
     pass
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "1234")
-DB_NAME = os.getenv("DB_NAME", "pgvector")
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASS", "password")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
 
 conn = psycopg2.connect(
     host=DB_HOST,
@@ -37,9 +37,14 @@ cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
 cur.execute('''
 CREATE TABLE IF NOT EXISTS document_embeddings (
     id SERIAL PRIMARY KEY,
-    document TEXT NOT NULL,
-    chunk TEXT NOT NULL,
-    embedding vector(1536) NOT NULL
+    parent_id TEXT,
+    type TEXT,
+    document_id TEXT,
+    document_title TEXT NOT NULL,
+    chunk_index INTEGER NOT NULL,
+    source TEXT,
+    content TEXT,
+    embedding VECTOR(1536) NOT NULL
 );
 ''')
 
