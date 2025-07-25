@@ -9,6 +9,7 @@ from langchain_core.messages import HumanMessage
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
 from tools.time import get_time 
+from tools.google_drive import get_gdrive_context
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
@@ -32,7 +33,7 @@ llm = ChatGoogleGenerativeAI(
 )
 
 # Tool list
-tools = [get_time]#, video_day]
+tools = [get_time, get_gdrive_context]
 
 # Tool-calling prompt
 prompt = ChatPromptTemplate.from_messages([

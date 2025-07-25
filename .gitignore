@@ -5,3 +5,4 @@ __pycache__/
 .temp
 .csv
 .logs
+chroma_data

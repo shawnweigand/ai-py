@@ -8,7 +8,7 @@ from loaders.drive_loader import load_drive_folder_docs
 from splitters.recursive_splitter import split_recursive_docs
 
 client = PersistentClient(path="./chroma_data")
-collection = client.get_or_create_collection("my_collection")
+collection = client.get_or_create_collection("google_drive")
 
 load_dotenv()
 
@@ -52,7 +52,8 @@ for i, doc in enumerate(docs):
             "content": chunk.page_content,
             "embedding": embedding,
         }
-        print(data)
+        print(f"Adding chunk {j + 1} of {len(chunks)} for {data['document_title']}")
+        # print(data)
         # Insert data into database
         collection.add(
             documents=[f"{data['document_title']}-{data['chunk_index']}"],
@@ -61,4 +62,4 @@ for i, doc in enumerate(docs):
             ids=[f"{data['document_title']}-{data['chunk_index']}"],
         )
 
-print(collection.get())
+print(collection.get(include=["embeddings", "documents", "ids"]))
